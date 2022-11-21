@@ -1,4 +1,5 @@
 import InfiniteScroll from "react-infinite-scroller";
+import { useInfiniteQuery } from "react-query";
 import { Species } from "./Species";
 
 const initialUrl = "https://swapi.dev/api/species/";
@@ -7,7 +8,37 @@ const fetchUrl = async (url) => {
   return response.json();
 };
 
+
 export function InfiniteSpecies() {
   // TODO: get data for InfiniteScroll via React Query
-  return <InfiniteScroll />;
+
+  const {data, isLoading, fetchNextPage, hasNextPage, isError, error } = useInfiniteQuery(
+    "species",
+    ({pageParam = initialUrl}) => fetchUrl(pageParam),
+    {getNextPageParam: (lastPage) => lastPage.next || undefined}
+
+  )
+
+  if(isLoading) return <p>Loading...</p>
+  if(isError) return <p>Error! {error.toString()}</p>
+
+  return (
+    
+    <InfiniteScroll loadMore={fetchNextPage} hasMore={hasNextPage}>
+      {data.pages.map((pageData) => {
+        return pageData.results.map((species) => {
+          return (
+            <Species 
+              key={species.name}
+              name={species.name}
+              language={species.language}
+              averageLifespan={species.average_lifespan}
+            
+            />
+          )
+        })
+      })}
+    </InfiniteScroll>
+
+  )
 }

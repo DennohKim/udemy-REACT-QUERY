@@ -12,8 +12,8 @@ ReactDOM.render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <App />
+      <ReactQueryDevtools />
     </QueryClientProvider>
-    <ReactQueryDevtools />
   </React.StrictMode>,
   document.getElementById("root")
 );

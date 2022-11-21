@@ -14,10 +14,31 @@ export function InfinitePeople() {
 
   //fetchNextPage is a function that runs when we want more data to be fetched
   //hasNextPage is a boolean that check if there is any more pages for data to collect
-  const { data, fetchNextPage, hasNextPage } = useInfiniteQuery(
+  const { data, fetchNextPage, hasNextPage, isLoading, isFetching,  isError,error } = useInfiniteQuery(
     "sw-people",
     ({ pageParam = initialUrl }) => fetchUrl(pageParam),
-    { getNextPageParam: (lastPage) => lastPage.next || undefined  }
+    { getNextPageParam: (lastPage) => lastPage.next || undefined }
   );
-  return <InfiniteScroll />;
+
+  if(isLoading) return <p>Loading...</p>
+  if(isError) return <p>Error! {error.toString()}</p>
+
+  return (
+    <> {isFetching && <div className="loading">Loading ...</div>}
+     <InfiniteScroll loadMore={fetchNextPage} hasMore={hasNextPage}>
+      {data.pages.map((pageData) => {
+        return pageData.results.map((person) => {
+          return (
+            <Person
+              key={person.key}
+              name={person.name}
+              hairColor={person.hair_color}
+              eyeColor={person.eye_color}
+            />
+          );
+        });
+      })}
+    </InfiniteScroll></>
+   
+  );
 }
